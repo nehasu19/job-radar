@@ -1,27 +1,27 @@
 {
-  "name": "Alex Example",
-  "resume": "Alex Example\nSenior QA Engineer\nBerlin, Germany · alex@example.com\n\nSUMMARY\n...\n\nSKILLS\n...\n\nEXPERIENCE\n...\n\nEDUCATION\n...",
+  "name": "Your Full Name",
+  "resume": "Your Full Name\nYour Current Job Title\nCity, Country · you@example.com · +00 000 0000000\n\nSUMMARY\n2-4 sentences about your experience and strengths.\n\nSKILLS\nSkill area: tool, tool, tool\n\nEXPERIENCE\nJob Title — Company, City · Mon YYYY – Present\n- What you did and achieved.\n\nEDUCATION\nDegree — University, Country, YYYY – YYYY\n\nLANGUAGES\nLanguage — level",
   "roles": [
-    "Senior QA / Test Engineer",
-    "Test Automation Engineer / SDET",
-    "QA Lead"
+    "Target role 1",
+    "Target role 2",
+    "Target role 3"
   ],
   "locations": [
-    "Berlin",
-    "Remote within Germany"
+    "Preferred city",
+    "Remote within your country"
   ],
-  "language_rules": "German B1. Include English-working-language roles and roles asking for German up to B1 (B2 as nice to have). Skip roles requiring fluent German unless an excellent match, then flag as stretch.",
-  "availability": "Available from 1 March 2027",
+  "language_rules": "Describe the languages you can work in, e.g. 'Include English-speaking roles and roles asking for basic local language. Skip roles requiring fluent local language unless an excellent match, then flag as stretch.'",
+  "availability": "Available from DD Month YYYY",
   "excluded_employers": [
-    "Current Employer GmbH"
+    "Your current employer"
   ],
   "target_companies": [
-    "Example Corp",
-    "Another Company"
+    "Company you would like to work for",
+    "Another company"
   ],
   "domains": [
-    "automotive",
-    "fintech"
+    "industry 1",
+    "industry 2"
   ],
   "min_score": 60,
   "resume_min_score": 75,
