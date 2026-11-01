@@ -56,3 +56,12 @@ LinkedIn blocks automated reading of its pages, and Job Radar respects that. Ins
 ## Licence
 
 MIT – see [LICENSE](LICENSE).
+
+## What's new in v2.0.0
+
+- Runs **every day, including weekends** (v1 ran weekdays only)
+- Searches StepStone, LinkedIn, Indeed, XING, Glassdoor, Arbeitsagentur, Arbeitnow, Built In, TestDevJobs, Jobgether and company career pages
+- Better duplicate detection when the same role is listed under a parent company
+- Adds the tracker page (`tracker/`), the daily task prompt (`prompt/`) and the data model (`docs/`)
+
+See [CHANGELOG.md](CHANGELOG.md) for details.

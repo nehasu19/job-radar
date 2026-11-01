@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Job Radar</title>
+<!-- Job Radar tracker v2.0.0. Runs as a Claude artifact with the "db" and "user" capabilities (window.claude.use). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a single scanning column — summary strip, status filter, then one row per job, best match first. */
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --ink:#16202e; --muted:#5b6676; --line:#dfe3ea;
+  --accent:#1f5fbf; --accent-soft:#e6eefb;
+  --good:#1f7a4d; --good-soft:#e3f3ea; --warn:#9a6200; --warn-soft:#fbf0dc; --bad:#a3322a; --bad-soft:#f8e4e2;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10151d; --surface:#18202b; --ink:#e7ecf3; --muted:#9aa6b6; --line:#2a3443;
+  --accent:#7aa8f0; --accent-soft:#1d2c44;
+  --good:#6cc79a; --good-soft:#163024; --warn:#e6b45c; --warn-soft:#33280f; --bad:#ef8a80; --bad-soft:#3a1c1a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10151d; --surface:#18202b; --ink:#e7ecf3; --muted:#9aa6b6; --line:#2a3443;
+  --accent:#7aa8f0; --accent-soft:#1d2c44;
+  --good:#6cc79a; --good-soft:#163024; --warn:#e6b45c; --warn-soft:#33280f; --bad:#ef8a80; --bad-soft:#3a1c1a; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--body)}
+.wrap{max-width:980px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+h1{font:800 clamp(1.7rem,4vw,2.4rem)/1.1 var(--display);margin:0;letter-spacing:-.01em;text-wrap:balance}
+.sub{color:var(--muted);margin:6px 0 0;max-width:65ch}
+.strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.stat b{display:block;font:600 1.6rem/1 var(--mono);font-variant-numeric:tabular-nums}
+.stat span{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:600 .85rem var(--body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip:focus-visible,select:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select{font:inherit;font-size:.9rem;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+.list{display:grid;gap:10px}
+.job{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:64px minmax(0,1fr);gap:16px}
+.score{display:grid;place-items:center;align-content:center;border-radius:8px;height:64px;font:600 1.35rem var(--mono);font-variant-numeric:tabular-nums}
+.score small{font:600 .62rem var(--body);letter-spacing:.06em;text-transform:uppercase}
+.s-hi{background:var(--good-soft);color:var(--good)} .s-mid{background:var(--accent-soft);color:var(--accent)} .s-lo{background:var(--warn-soft);color:var(--warn)}
+.top{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;justify-content:space-between}
+.job h2{font:600 1.12rem/1.3 var(--display);margin:0}
+.job h2 a{color:inherit;text-decoration:none} .job h2 a:hover{text-decoration:underline}
+.meta{color:var(--muted);font-size:.92rem;margin-top:2px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{font-size:.78rem;font-weight:600;padding:2px 8px;border-radius:4px;background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.tag.de-ok{color:var(--good);border-color:var(--good)} .tag.de-stretch{color:var(--bad);border-color:var(--bad)}
+.why{margin:10px 0 0;font-size:.95rem;max-width:72ch}
+.gap{margin:4px 0 0;font-size:.9rem;color:var(--muted);max-width:72ch}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px;font-size:.9rem}
+.actions a{color:var(--accent);font-weight:600}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:28px;text-align:center;color:var(--muted)}
+.empty strong{display:block;color:var(--ink);font:600 1.1rem var(--display);margin-bottom:6px}
+details{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+summary{cursor:pointer;font-weight:600}
+dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 16px;margin:12px 0 0;font-size:.93rem}
+dt{color:var(--muted)} dd{margin:0}
+.note{font-size:.85rem;color:var(--muted)}
+@media (max-width:560px){.strip{grid-template-columns:repeat(2,minmax(0,1fr))}.job{grid-template-columns:1fr}.score{height:auto;padding:6px 10px;grid-auto-flow:column;gap:8px;justify-content:start;width:max-content}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Job Radar</h1>
+    <p class="sub">QA, AI-quality and QA lead roles found by your daily job search. Best matches come first. Change a job's status as you go; tailored resumes are linked on each job.</p>
+  </header>
+
+  <section class="strip" aria-label="Summary">
+    <div class="stat"><b id="c-new">–</b><span>New</span></div>
+    <div class="stat"><b id="c-short">–</b><span>Shortlisted</span></div>
+    <div class="stat"><b id="c-applied">–</b><span>Applied</span></div>
+    <div class="stat"><b id="c-int">–</b><span>Interviewing</span></div>
+  </section>
+
+  <div class="bar">
+    <div class="chips" id="chips" role="group" aria-label="Filter by status"></div>
+    <label class="note">Sort
+      <select id="sort"><option value="score">Best match</option><option value="date">Newest</option></select>
+    </label>
+  </div>
+
+  <section class="list" id="list" aria-live="polite">
+    <div class="empty"><strong>No jobs yet</strong>Your first search runs tomorrow morning. Matching jobs will appear here with a score, the German level they need, and a tailored resume for the top picks.</div>
+  </section>
+
+  <details id="prefs">
+    <summary>Search profile</summary>
+    <dl id="prefs-dl"><dt>Status</dt><dd>Loading…</dd></dl>
+  </details>
+</div>
+
+<script>
+const EMPTY_MSG="Your first search runs tomorrow morning. Matching jobs will appear here with a score, the German level they need, and a tailored resume for the top picks.";
+const STATUSES=[["new","New"],["shortlisted","Shortlisted"],["applied","Applied"],["interview","Interviewing"],["offer","Offer"],["rejected","Rejected"],["not-interested","Not interested"]];
+let jobs=[], filter="open", sortBy="score", db=null, canWrite=true;
+
+const chipsEl=document.getElementById("chips");
+const FILTERS=[["open","Open"],["new","New"],["shortlisted","Shortlisted"],["applied","Applied"],["interview","Interviewing"],["closed","Closed"],["all","All"]];
+function renderChips(){
+  chipsEl.innerHTML="";
+  for(const [k,l] of FILTERS){
+    const b=document.createElement("button");b.className="chip";b.type="button";b.id="f-"+k;b.textContent=l;
+    b.setAttribute("aria-pressed",String(filter===k));
+    b.onclick=()=>{filter=k;renderChips();render();};
+    chipsEl.appendChild(b);
+  }
+}
+document.getElementById("sort").onchange=e=>{sortBy=e.target.value;render();};
+
+function matches(j){
+  const s=j.status||"new";
+  if(filter==="all")return true;
+  if(filter==="open")return !["rejected","not-interested"].includes(s);
+  if(filter==="closed")return ["rejected","not-interested","offer"].includes(s);
+  return s===filter;
+}
+function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+function safeUrl(u){try{const x=new URL(u);return /^https?:$/.test(x.protocol)?x.href:null;}catch{return null;}}
+
+function render(){
+  const count=s=>jobs.filter(j=>(j.status||"new")===s).length;
+  document.getElementById("c-new").textContent=count("new");
+  document.getElementById("c-short").textContent=count("shortlisted");
+  document.getElementById("c-applied").textContent=count("applied");
+  document.getElementById("c-int").textContent=count("interview");
+  const list=document.getElementById("list");
+  const rows=jobs.filter(matches).sort((a,b)=>sortBy==="score"?(b.score||0)-(a.score||0):String(b.found_at||"").localeCompare(String(a.found_at||"")));
+  list.innerHTML="";
+  if(!rows.length){
+    const e=el("div","empty");
+    e.appendChild(el("strong",null,jobs.length?"Nothing in this view":"No jobs yet"));
+    e.appendChild(document.createTextNode(jobs.length?"Try another filter.":EMPTY_MSG));
+    list.appendChild(e);return;
+  }
+  for(const j of rows){
+    const card=el("article","job");
+    const sc=Number(j.score)||0;
+    const s=el("div","score "+(sc>=80?"s-hi":sc>=65?"s-mid":"s-lo"));
+    s.appendChild(document.createTextNode(sc));s.appendChild(el("small",null,"match"));
+    card.appendChild(s);
+    const body=el("div");body.style.minWidth="0";
+    const top=el("div","top");
+    const h=el("h2");const url=safeUrl(j.url);
+    if(url){const a=el("a",null,j.title||"Untitled role");a.href=url;a.target="_blank";a.rel="noopener";h.appendChild(a);}else h.textContent=j.title||"Untitled role";
+    top.appendChild(h);
+    top.appendChild(el("span","note",j.found_at?("Found "+String(j.found_at).slice(0,10)):""));
+    body.appendChild(top);
+    body.appendChild(el("div","meta",[j.company,j.location,j.work_mode].filter(Boolean).join(" · ")));
+    const tags=el("div","tags");
+    if(j.german){const g=String(j.german);tags.appendChild(el("span","tag "+(/c1|fluent|fließend|verhandlungs/i.test(g)?"de-stretch":"de-ok"),"German: "+g));}
+    if(j.source)tags.appendChild(el("span","tag",j.source));
+    if(j.posted)tags.appendChild(el("span","tag","Posted "+j.posted));
+    body.appendChild(tags);
+    if(j.why)body.appendChild(el("p","why",j.why));
+    if(j.gaps)body.appendChild(el("p","gap","Gaps: "+j.gaps));
+    const act=el("div","actions");
+    const sel=el("select");sel.id="st-"+j.id;sel.setAttribute("aria-label","Status for "+(j.title||"job"));
+    for(const [k,l] of STATUSES){const o=el("option",null,l);o.value=k;if((j.status||"new")===k)o.selected=true;sel.appendChild(o);}
+    sel.disabled=!db||!canWrite;
+    sel.onchange=async()=>{try{await db.doc("jobs/"+j.id).update({status:sel.value,status_changed:new Date().toISOString()});}catch(e){sel.value=j.status||"new";if(e&&e.code==="invalid_argument"){canWrite=false;render();}}};
+    act.appendChild(sel);
+    const r=safeUrl(j.resume_url);
+    if(r){const a=el("a",null,"Tailored resume");a.href=r;a.target="_blank";a.rel="noopener";act.appendChild(a);}
+    if(url){const a=el("a",null,"Open posting");a.href=url;a.target="_blank";a.rel="noopener";act.appendChild(a);}
+    body.appendChild(act);
+    card.appendChild(body);
+    list.appendChild(card);
+  }
+}
+
+function renderPrefs(p){
+  const dl=document.getElementById("prefs-dl");dl.innerHTML="";
+  if(!p){dl.appendChild(el("dt",null,"Status"));dl.appendChild(el("dd",null,"No search profile saved yet."));return;}
+  const rows=[["Roles",p.roles],["Locations",p.locations],["German",p.german],["Schedule",p.schedule],["Resume",p.resume_updated?("Base resume saved "+String(p.resume_updated).slice(0,10)):null]];
+  for(const [k,v] of rows){if(!v)continue;dl.appendChild(el("dt",null,k));dl.appendChild(el("dd",null,Array.isArray(v)?v.join(", "):String(v)));}
+}
+
+renderChips();render();
+(async()=>{
+  db=await (window.claude?.use?.("db")??null);
+  if(!db){renderPrefs(null);return;}
+  try{const u=await window.claude.use("user");const c=u&&await u.can("data.write");if(c===false)canWrite=false;}catch{}
+  db.collection("jobs").onSnapshot(s=>{jobs=s.docs.map(d=>({id:d.id,...d.data()}));render();},()=>{});
+  db.doc("config/profile").onSnapshot(s=>renderPrefs(s.exists?s.data():null),()=>{});
+})();
+</script>
+</body>
+</html>
