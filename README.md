@@ -65,3 +65,21 @@ MIT – see [LICENSE](LICENSE).
 - Adds the tracker page (`tracker/`), the daily task prompt (`prompt/`) and the data model (`docs/`)
 
 See [CHANGELOG.md](CHANGELOG.md) for details.
+
+## What's new in v3.0.0
+
+- **Weekly digest** every Sunday: top 5 roles, jobs found vs last week, and jobs still waiting on you
+- **Cover-letter drafts** next to each tailored resume — truthful, with gaps handled honestly
+- **Closed-posting detection:** taken-down jobs are flagged automatically
+- **Tracker stats:** jobs per week, average match score, and progress from found to interviewing
+
+See [CHANGELOG.md](CHANGELOG.md) for details.
+
+## What's new in v3.0.0
+
+- **Weekly digest** every Sunday: top 5 roles, jobs found vs last week, and jobs still waiting on you
+- **Cover-letter drafts** next to each tailored resume — truthful, with gaps handled honestly
+- **Closed-posting detection:** taken-down jobs are flagged automatically
+- **Tracker stats:** jobs per week, average match score, and progress from found to interviewing
+
+See [CHANGELOG.md](CHANGELOG.md) for details.
