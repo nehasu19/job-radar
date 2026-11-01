@@ -1,0 +1,30 @@
+{
+  "name": "Alex Example",
+  "resume": "Alex Example\nSenior QA Engineer\nBerlin, Germany · alex@example.com\n\nSUMMARY\n...\n\nSKILLS\n...\n\nEXPERIENCE\n...\n\nEDUCATION\n...",
+  "roles": [
+    "Senior QA / Test Engineer",
+    "Test Automation Engineer / SDET",
+    "QA Lead"
+  ],
+  "locations": [
+    "Berlin",
+    "Remote within Germany"
+  ],
+  "language_rules": "German B1. Include English-working-language roles and roles asking for German up to B1 (B2 as nice to have). Skip roles requiring fluent German unless an excellent match, then flag as stretch.",
+  "availability": "Available from 1 March 2027",
+  "excluded_employers": [
+    "Current Employer GmbH"
+  ],
+  "target_companies": [
+    "Example Corp",
+    "Another Company"
+  ],
+  "domains": [
+    "automotive",
+    "fintech"
+  ],
+  "min_score": 60,
+  "resume_min_score": 75,
+  "max_age_days": 21,
+  "max_new_per_run": 10
+}
