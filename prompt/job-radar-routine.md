@@ -1,4 +1,4 @@
-# Job Radar — daily scheduled-task prompt (v3.0.0)
+# Job Radar — daily scheduled-task prompt (v3.0.1)
 
 Schedule: `CRON_TZ=Europe/Berlin 45 8 * * *` (daily, including weekends)
 

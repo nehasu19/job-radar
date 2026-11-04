@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.0.1] — 2026-11-04
+
+### Fixed
+- **The skill itself now has the v3 features.** In 3.0.0 only the tracker, prompts and docs were updated; `job-radar/SKILL.md` and `job-radar.skill` were still v2. They now include the cover-letter step, the closed-posting check, the weekly digest mode, the TestDevJobs / Jobgether / Startup Insider sources and the parent-company duplicate check. The skill states its version.
+- The skill description no longer contains angle brackets, which the Claude skill uploader rejected.
+- `prompt/job-radar-routine.md` no longer hard-codes one person's language rules, scoring angle and thresholds; everything comes from the profile. The weekly digest uses the profile's timezone.
+- `docs/schema.md` and `examples/profile.example.json` now list the same profile fields, including `key_skills`, `timezone` and `max_closed_checks`.
+- README and the example scheduled-task prompt described weekday-only runs; they now say every day, including weekends. The README explains how to set up the weekly digest and removes a duplicated section.
+- CHANGELOG: removed a duplicated 3.0.0 entry.
+
 ## [3.0.0] — 2026-11-01
 
 ### Added
@@ -10,13 +20,6 @@
 
 ### Changed
 - Data model: new `cover_url`, `closed` and `closed_checked_at` fields (see `docs/schema.md`).
-- `job-radar/SKILL.md` and `job-radar.skill` updated to v3: cover-letter step, closed-posting check, weekly digest mode, TestDevJobs / Jobgether / Startup Insider sources, parent-company duplicate check. The skill now states its version.
-
-### Fixed
-- README and example scheduled-task prompt still described weekday-only runs; they now say every day, including weekends.
-- README now explains how to set up the weekly digest.
-- `prompt/job-radar-routine.md` no longer hard-codes one person's language rules, scoring angle and thresholds; everything comes from the profile.
-- `docs/schema.md` and `examples/profile.example.json` now list the same profile fields, including `key_skills`, `timezone` and `max_closed_checks`.
 
 ## [2.0.0] — 2026-11-01
 

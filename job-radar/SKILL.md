@@ -5,7 +5,7 @@ description: Run a personal job search for whoever is using it - find live jobs 
 
 # Job Radar
 
-Version: 3.0.0
+Version: 3.0.1
 
 Finds jobs for the candidate (the person using this skill), logs them in their tracker, keeps the tracker current by flagging closed postings, and drafts tailored resumes and cover letters. It is a search-and-draft tool only.
 

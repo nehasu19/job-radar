@@ -63,6 +63,11 @@ LinkedIn blocks automated reading of its pages, and Job Radar respects that. Ins
 
 MIT – see [LICENSE](LICENSE).
 
+## What's new in v3.0.1
+
+- Fixes the skill file so it actually includes the v3 features (cover letters, closed-posting check, weekly digest), and it now uploads to Claude without errors
+- The daily task prompt now uses your own profile for language rules and thresholds
+
 ## What's new in v3.0.0
 
 - **Weekly digest** every Sunday: top 5 roles, jobs found vs last week, and jobs still waiting on you
