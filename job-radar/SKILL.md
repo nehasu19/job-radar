@@ -1,6 +1,6 @@
 ---
 name: job-radar
-description: Run a personal job search for whoever is using it - find live jobs that match the candidate's saved profile (target roles, locations, language rules), score them against their resume, log new ones in their Job Radar tracker, flag postings that have closed, draft truthful tailored resumes and cover letters for the best matches, and send a weekly digest. Use when the user asks to "run job radar", "find new jobs", "search for jobs", "set up job radar", "add this job to my tracker", "tailor my resume for <job>", "write a cover letter for <job>", "check for closed postings" or "send my weekly digest". Never applies or contacts anyone.
+description: Run a personal job search for whoever is using it - find live jobs that match the candidate's saved profile (target roles, locations, language rules), score them against their resume, log new ones in their Job Radar tracker, flag postings that have closed, draft truthful tailored resumes and cover letters for the best matches, and send a weekly digest. Use when the user asks to "run job radar", "find new jobs", "search for jobs", "set up job radar", "add this job to my tracker", "tailor my resume for a job", "write a cover letter for a job", "check for closed postings" or "send my weekly digest". Never applies or contacts anyone.
 ---
 
 # Job Radar
