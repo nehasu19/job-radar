@@ -24,8 +24,28 @@ See [`examples/profile.example.json`](../examples/profile.example.json) for a fi
 | `max_age_days` | number | no | Skip postings older than this; default 21 |
 | `max_new_per_run` | number | no | New jobs added per run; default 10 |
 | `max_closed_checks` | number | no | Open jobs rechecked for closure per run; default 12 |
+| `application` | object | no | Answers for application forms, shown and edited on the tracker as **Application details** (see below) — **new in v3.3** |
 | `schedule` | string | no | Shown on the tracker |
 | `resume_updated` | string | no | ISO date |
+
+### `application` (optional)
+
+Shown on the tracker page with a Copy button per field and editable there. The daily run reads it fresh every time: cover-letter headers, availability, salary and work-permit lines come from here, and scoring uses `visa_sponsorship` and `salary`. All fields are strings.
+
+| Field | Example |
+|---|---|
+| `full_name` | Your Full Name |
+| `email` | you@example.com |
+| `phone` | +00 000 0000000 |
+| `linkedin` | https://www.linkedin.com/in/your-profile |
+| `location` | City, Country |
+| `work_permit` | Yes, valid work permit |
+| `visa_sponsorship` | `No` (has work rights) or `Yes` |
+| `salary` | EUR 70,000 gross per year |
+| `current_job_ends` | 31 January 2027 |
+| `earliest_start` | 1 February 2027 |
+| `german` | B1 |
+| `english` | Professional working proficiency |
 
 ## `jobs/<doc_id>`
 

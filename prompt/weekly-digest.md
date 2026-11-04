@@ -1,4 +1,4 @@
-# Job Radar — weekly digest prompt (v3.0.1)
+# Job Radar — weekly digest prompt (v3.3.0)
 
 Schedule: `CRON_TZ=Europe/Berlin 37 18 * * 0` (Sundays, evening)
 

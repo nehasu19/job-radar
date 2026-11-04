@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Job Radar</title>
-<!-- Job Radar tracker v3.0.0. Runs as a Claude artifact with the "db" and "user" capabilities (window.claude.use). -->
+<!-- Job Radar tracker v3.3.0. Runs as a Claude artifact with the "db" and "user" capabilities (window.claude.use). -->
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@500&display=swap">
@@ -84,6 +84,20 @@ summary{cursor:pointer;font-weight:600}
 dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 16px;margin:12px 0 0;font-size:.93rem}
 dt{color:var(--muted)} dd{margin:0}
 .note{font-size:.85rem;color:var(--muted)}
+.apply{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:12px}
+.apply-head{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:space-between}
+.apply h2{font:600 1.15rem/1.3 var(--display);margin:0}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:8px 18px}
+.field{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;align-items:center;padding:8px 0;border-top:1px solid var(--line);min-width:0}
+.field .label{grid-column:1/-1}
+.field .val{min-width:0;overflow-wrap:anywhere;font-size:.95rem}
+.field .val.missing{color:var(--warn);font-style:italic}
+.field input{font:inherit;font-size:.93rem;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);min-width:0;width:100%;box-sizing:border-box}
+.btn{font:600 .82rem var(--body);border:1px solid var(--line);background:var(--surface);color:var(--accent);border-radius:6px;padding:4px 10px;cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.btn:focus-visible,.field input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.kit{margin:8px 0 0;font-size:.88rem;color:var(--muted);max-width:72ch}
+.kit b{color:var(--ink);font-weight:600}
 @media (max-width:720px){.stats{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:560px){.job{grid-template-columns:1fr}.score{height:auto;padding:6px 10px;grid-auto-flow:column;gap:8px;justify-content:start;width:max-content}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -115,6 +129,16 @@ dt{color:var(--muted)} dd{margin:0}
       <div class="weeks" id="weeks"></div>
       <div class="funnel" id="funnel" aria-label="Progress"></div>
     </div>
+  </section>
+
+  <section class="apply" aria-labelledby="apply-title">
+    <div class="apply-head">
+      <h2 id="apply-title">Application details</h2>
+      <div class="chips"><button class="btn" type="button" id="apply-edit">Edit</button><button class="btn primary" type="button" id="apply-save" hidden>Save</button><button class="btn" type="button" id="apply-cancel" hidden>Cancel</button></div>
+    </div>
+    <p class="note" style="margin:0">These are the answers for application forms. Copy a field into the form, or edit it here. Claude uses the same details when it drafts cover letters.</p>
+    <div class="fields" id="apply-fields"><div class="field"><span class="label">Status</span><span class="val">Loading…</span></div></div>
+    <p class="note" id="apply-msg" style="margin:0" aria-live="polite"></p>
   </section>
 
   <div class="bar">
@@ -244,6 +268,9 @@ function render(){
     body.appendChild(tags);
     if(j.why)body.appendChild(el("p","why",j.why));
     if(j.gaps)body.appendChild(el("p","gap","Gaps: "+j.gaps));
+    const kitP=el("p","kit");kitP.appendChild(el("b",null,"To upload: "));
+    kitP.appendChild(document.createTextNode(j.resume_url?(j.cover_url?"tailored resume and cover letter (links below)":"tailored resume (link below)"):"base resume (no tailored version yet; ask Claude for one)"));
+    body.appendChild(kitP);
     const act=el("div","actions");
     const sel=el("select");sel.id="st-"+j.id;sel.setAttribute("aria-label","Status for "+(j.title||"job"));
     for(const [k,l] of STATUSES){const o=el("option",null,l);o.value=k;if((j.status||"new")===k)o.selected=true;sel.appendChild(o);}
@@ -261,6 +288,37 @@ function render(){
   }
 }
 
+const APPLY_FIELDS=[["full_name","Full name"],["email","Email"],["phone","Phone"],["linkedin","LinkedIn"],["location","Location"],["work_permit","Work permit"],["visa_sponsorship","Visa sponsorship needed"],["salary","Salary expectation"],["current_job_ends","Current job ends"],["earliest_start","Earliest start date"],["german","German"],["english","English"]];
+let profile=null, editingApply=false;
+function renderApply(){
+  const box=document.getElementById("apply-fields");box.innerHTML="";
+  const a=(profile&&profile.application)||{};
+  for(const [k,l] of APPLY_FIELDS){
+    const f=el("div","field");const lab=el("label","label",l);lab.htmlFor="ap-"+k;f.appendChild(lab);
+    if(editingApply){const i=el("input");i.id="ap-"+k;i.value=a[k]||"";f.appendChild(i);}
+    else{
+      const v=a[k];const val=el("span","val"+(v?"":" missing"),v||"Not set");val.id="ap-"+k;f.appendChild(val);
+      if(v){const b=el("button","btn","Copy");b.type="button";b.setAttribute("aria-label","Copy "+l);
+        b.onclick=()=>{const done=()=>{b.textContent="Copied";setTimeout(()=>b.textContent="Copy",1500);};
+          try{navigator.clipboard.writeText(v).then(done,()=>selectText(val));}catch{selectText(val);}};
+        f.appendChild(b);}
+    }
+    box.appendChild(f);
+  }
+  document.getElementById("apply-edit").hidden=editingApply||!db||!canWrite;
+  document.getElementById("apply-save").hidden=!editingApply;
+  document.getElementById("apply-cancel").hidden=!editingApply;
+}
+function selectText(n){const r=document.createRange();r.selectNodeContents(n);const s=getSelection();s.removeAllRanges();s.addRange(r);}
+document.getElementById("apply-edit").onclick=()=>{editingApply=true;document.getElementById("apply-msg").textContent="";renderApply();};
+document.getElementById("apply-cancel").onclick=()=>{editingApply=false;renderApply();};
+document.getElementById("apply-save").onclick=async()=>{
+  const msg=document.getElementById("apply-msg");const next={...((profile&&profile.application)||{})};
+  for(const [k] of APPLY_FIELDS){next[k]=document.getElementById("ap-"+k).value.trim();}
+  try{await db.doc("config/profile").update({application:next});editingApply=false;msg.textContent="Saved.";renderApply();}
+  catch(e){msg.textContent="Couldn't save. Check your connection and try Save again.";}
+};
+
 function renderPrefs(p){
   const dl=document.getElementById("prefs-dl");dl.innerHTML="";
   if(!p){dl.appendChild(el("dt",null,"Status"));dl.appendChild(el("dd",null,"No search profile saved yet."));return;}
@@ -271,10 +329,10 @@ function renderPrefs(p){
 renderChips();render();
 (async()=>{
   db=await (window.claude?.use?.("db")??null);
-  if(!db){renderPrefs(null);return;}
+  if(!db){renderPrefs(null);renderApply();return;}
   try{const u=await window.claude.use("user");const c=u&&await u.can("data.write");if(c===false)canWrite=false;}catch{}
   db.collection("jobs").onSnapshot(s=>{jobs=s.docs.map(d=>({id:d.id,...d.data()}));render();},()=>{});
-  db.doc("config/profile").onSnapshot(s=>renderPrefs(s.exists?s.data():null),()=>{});
+  db.doc("config/profile").onSnapshot(s=>{profile=s.exists?s.data():null;renderPrefs(profile);if(!editingApply)renderApply();},()=>{});
 })();
 </script>
 

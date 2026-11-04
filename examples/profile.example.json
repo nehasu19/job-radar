@@ -32,5 +32,19 @@
   "resume_min_score": 75,
   "max_age_days": 21,
   "max_new_per_run": 10,
-  "max_closed_checks": 12
+  "max_closed_checks": 12,
+  "application": {
+    "full_name": "Your Full Name",
+    "email": "you@example.com",
+    "phone": "+00 000 0000000",
+    "linkedin": "https://www.linkedin.com/in/your-profile",
+    "location": "City, Country",
+    "work_permit": "Yes, valid work permit",
+    "visa_sponsorship": "No",
+    "salary": "EUR 70,000 gross per year",
+    "current_job_ends": "DD Month YYYY",
+    "earliest_start": "DD Month YYYY",
+    "german": "B1",
+    "english": "Professional working proficiency"
+  }
 }

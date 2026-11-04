@@ -16,6 +16,7 @@ It **never** applies to jobs, fills in forms or contacts anyone. You stay in con
 - A Claude plan with skills and artifacts enabled (claude.ai or the Claude app)
 - Web search enabled
 - Optional: Claude Docs (for tailored resumes and cover letters as editable documents)
+- Optional: a `tailored-cv` skill and a `no-ai-slop` skill; if you have them, Job Radar follows them when it drafts resumes and cover letters
 - Optional: scheduled tasks, to run the search every morning and send the weekly digest
 
 ## Install
@@ -62,6 +63,16 @@ LinkedIn blocks automated reading of its pages, and Job Radar respects that. Ins
 ## Licence
 
 MIT – see [LICENSE](LICENSE).
+
+## What's new in v3.3.0
+
+- **Application details** on the tracker: your contact details, work permit, visa needs, salary expectation and start date, with a Copy button per field for pasting into application forms. Edit them on the page.
+- Cover letters take their header, start date, salary and work-permit lines from those details, so they always match what you put in forms.
+- Scoring knows whether you need visa sponsorship, and lowers the score a little when a posting's salary is clearly below your expectation.
+- Resumes and cover letters follow your `tailored-cv` and `no-ai-slop` skills when you have them.
+- Each job card says what to upload: the tailored resume and cover letter, or your base resume.
+
+See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## What's new in v3.0.1
 

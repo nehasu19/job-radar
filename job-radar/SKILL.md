@@ -5,7 +5,7 @@ description: Run a personal job search for whoever is using it - find live jobs 
 
 # Job Radar
 
-Version: 3.0.1
+Version: 3.3.0
 
 Finds jobs for the candidate (the person using this skill), logs them in their tracker, keeps the tracker current by flagging closed postings, and drafts tailored resumes and cover letters. It is a search-and-draft tool only.
 
@@ -37,6 +37,7 @@ Full field reference: `docs/schema.md` in the Job Radar repository.
   - `language_rules` (or `german`) - language requirements they can meet and what to skip or flag as "stretch"
   - `availability` - notice period / start date
   - `excluded_employers` - list (e.g. current employer)
+  - `application` (optional) - the **Application details** shown and edited on the tracker page, the answers for application forms: `full_name`, `email`, `phone`, `linkedin`, `location`, `work_permit`, `visa_sponsorship`, `salary`, `current_job_ends`, `earliest_start`, `german`, `english`. The candidate edits these on the page, so read them fresh on every run and use them exactly as stored.
   - optional: `target_companies`, `key_skills`, `domains`, `timezone` (default "Europe/Berlin"), `min_score` (default 60), `resume_min_score` (default 75), `max_age_days` (default 21), `max_new_per_run` (default 10), `max_closed_checks` (default 12)
 - `jobs/<doc_id>` - one document per job (fields in step 6), plus `resume_url`, `cover_url`, `closed` and `closed_checked_at` once set.
 
@@ -44,7 +45,7 @@ Full field reference: `docs/schema.md` in the Job Radar repository.
 
 1. Ask for (or take from an attached file) their resume, target roles, locations, language level, availability and employers to exclude.
 2. Load the `artifact-design` and `artifact-capabilities` skills, then publish a "Job Radar" page with the `db` capability. Use `tracker/index.html` from the Job Radar repository when it is available; otherwise build a page that lists `jobs` (sortable by score, filterable by status and by "Posting closed", showing title, company, location, work mode, language, score, why, gaps, status, links to posting, tailored resume and cover letter), lets the viewer change `status`, and shows stats (found this week, average match, applied, interviewing, waiting on you, postings closed, jobs per week for the last 6 weeks, a Found → Interviewing funnel).
-3. Write `config/profile` with `ArtifactData` set.
+3. Write `config/profile` with `ArtifactData` set, including an `application` block if they give contact details, work permit, salary expectation and start date. The tracker page shows it as "Application details" with a Copy button per field, so they can paste the answers into application forms themselves.
 4. Offer to create the two scheduled tasks: the daily run (every day, including weekends) and the Sunday-evening weekly digest. Ready-made prompts are in `prompt/job-radar-routine.md` and `prompt/weekly-digest.md` in the repository.
 
 ## Modes
@@ -57,7 +58,7 @@ Full field reference: `docs/schema.md` in the Job Radar repository.
 
 ## Steps (full run)
 
-1. **Read profile**: `ArtifactData` get, collection `config`, doc_id `profile`. Derive search terms, skills and domains from `roles`, `resume` and any optional fields.
+1. **Read profile**: `ArtifactData` get, collection `config`, doc_id `profile`. Derive search terms, skills and domains from `roles`, `resume` and any optional fields. Note `application` (if present) for scoring and drafting.
 
 2. **Read existing jobs**: `ArtifactData` list, collection `jobs`, `query.limit` 1000 (page with cursor; `out_dir` to a scratch folder keeps context small). Record every doc_id, url and company + title pair to avoid duplicates - including the same role listed under a parent or brand company name (e.g. a subsidiary posted on a group careers site).
 
@@ -71,17 +72,20 @@ Full field reference: `docs/schema.md` in the Job Radar repository.
    Open each candidate posting to confirm it is live (WebFetch, or a `web-fetch` agent if WebFetch is unavailable - batch 5-8 URLs per agent, agents in parallel). Capture: live/expired, title, company, location, work mode, posting date (incl. JSON-LD datePosted/validThrough), language requirement quoted, seniority, stack, notable angle.
    Keep postings that are live, posted within `max_age_days` (if no date is shown, keep only if otherwise strong, mark "Date not shown" and flag it), fit the target roles and locations, and pass the language rules (a requirement above their level only if otherwise an excellent match, marked "stretch"). Skip excluded employers, roles clearly below their seniority, and duplicates from step 2. Note sites that couldn't be reached so they are retried next run.
 
-5. **Score** 0-100, honestly: role/seniority fit, skills/stack overlap with the resume, domain match, location/remote fit, language requirement, any special angle the profile emphasises. Keep jobs at or above `min_score`. Add at most `max_new_per_run`, best first.
+5. **Score** 0-100, honestly: role/seniority fit, skills/stack overlap with the resume, domain match, location/remote fit, language requirement, any special angle the profile emphasises. If `application.visa_sponsorship` is "No" (has a work permit), roles that say "EU work authorisation required" are fine. If a posting states a salary clearly below `application.salary`, keep it but lower the score a little and mention the salary in `gaps`. Keep jobs at or above `min_score`. Add at most `max_new_per_run`, best first.
 
 6. **Write new jobs** with one `ArtifactData` batch (op `set`, collection `jobs`, no `if_version` for new docs).
    doc_id: lowercase slug of company + title, letters/digits/hyphens, max 80 chars. Skip if the id or url already exists.
    Fields (strings except `score`): `title`, `company`, `location` ("City, Country"), `work_mode` ("On-site" | "Hybrid" | "Remote"), `url`, `source`, `posted`, `found_at` (ISO now, from `date -u`), `score` (number), `german` (language requirement, e.g. "Not required (English)", "B1", "B2 nice to have", "C1 required – stretch"), `why` (1-2 sentences, specific to the candidate), `gaps` (short), `status` "new".
 
-7. **Tailored resumes and cover letters** for the top 2-3 new jobs at or above `resume_min_score` (none if none qualify). Load the `docs` skill if listed. If Claude Docs is unavailable, publish clean one-page HTML artifacts with the same titles.
-   - **Resume**: a document titled "<name> – Resume – <Company> <Role>". Content: the base resume, reordered and re-emphasised for the posting, summary tightened, posting terminology mirrored only where it honestly applies. End with a section "Notes for <first name> (delete before sending)": the 5-8 posting keywords emphasised, gaps to address, the language level asked, and anything to verify (salary, work mode, start date vs. availability).
-   - **Cover letter**: a document titled "<name> – Cover Letter – <Company> <Role>". 200-280 words: header with contact details exactly as in the resume; "Dear Hiring Team," (or a named person only if the posting names one); why this role and company; 2-3 concrete matches drawn from the resume; one honest line on the main gap, framed through the closest real experience - never claiming the missing skill; availability from the profile; polite close and the candidate's name. Write in the posting's language only if the profile shows the candidate can (otherwise English). End with "Notes for <first name> (delete before sending)": what to personalise and anything to verify.
+7. **Tailored resumes and cover letters** for the top 2-3 new jobs at or above `resume_min_score` (none if none qualify). Before drafting, load these skills with the Skill tool if they are listed, and follow them for every resume and cover letter, including those written in Single job and Tailor only modes:
+   - `tailored-cv`: how to tailor the resume and cover letter to the posting (relevance rules, what to keep and cut, structure). Where it and this skill differ, use the stricter rule; truth rules always win.
+   - `no-ai-slop`: wording and style. Load the `docs` skill if listed. If Claude Docs is unavailable, publish clean one-page HTML artifacts with the same titles.
+   - **Resume**: a document titled "<name> – Resume – <Company> <Role>". Content: the base resume, reordered and re-emphasised for the posting, summary tightened, posting terminology mirrored only where it honestly applies. End with a section "Notes for <first name> (delete before sending)": the 5-8 posting keywords emphasised, gaps to address, the language level asked, and anything to verify (posting salary vs. `application.salary`, work mode, start date vs. `application.earliest_start`).
+   - **Cover letter**: a document titled "<name> – Cover Letter – <Company> <Role>". 200-280 words: header with name, location, phone, email and LinkedIn from `application` (fall back to the resume header if `application` is missing; if the two differ, use `application` and say so in the notes); "Dear Hiring Team," (or a named person only if the posting names one); why this role and company; 2-3 concrete matches drawn from the resume; one honest line on the main gap, framed through the closest real experience - never claiming the missing skill; availability from `application.earliest_start` (else `availability`); if the posting asks for salary expectations, state `application.salary` as stored, never a guessed number; if it asks about work authorisation, one plain sentence from `application.work_permit` and `application.visa_sponsorship`; polite close and the candidate's name. Write in the posting's language only if the profile shows the candidate can (otherwise English). End with "Notes for <first name> (delete before sending)": what to personalise and anything to verify.
    - Save both URLs on the job: `ArtifactData` update `{"resume_url": ..., "cover_url": ...}` with `if_version` from the write result.
    - Re-read both documents against the base resume: every title, date, employer, degree and certification must match, and the cover letter must not claim anything listed in `gaps`.
+   - Check both documents against the `tailored-cv` relevance rules (cut anything the posting doesn't need), then do a final `no-ai-slop` pass on both documents and rewrite any line that fails it before saving the URLs.
 
 8. **Verify**: query `jobs` once and confirm the new rows, `resume_url` / `cover_url` fields and any `closed` flags set in step 3.
 
