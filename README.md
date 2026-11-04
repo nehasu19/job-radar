@@ -6,7 +6,8 @@ Job Radar is a [Claude](https://claude.ai) skill that runs a personal job search
 - opens each posting to check it is still live and recent
 - scores each job 0–100 against your resume (role, skills, domain, location, language)
 - saves good matches to your own **Job Radar tracker**, without duplicates
-- drafts **truthful** tailored resumes for the best matches
+- drafts **truthful** tailored resumes and cover letters for the best matches
+- flags postings that have been taken down, and sends you a weekly digest
 
 It **never** applies to jobs, fills in forms or contacts anyone. You stay in control.
 
@@ -14,12 +15,12 @@ It **never** applies to jobs, fills in forms or contacts anyone. You stay in con
 
 - A Claude plan with skills and artifacts enabled (claude.ai or the Claude app)
 - Web search enabled
-- Optional: Claude Docs (for tailored resumes as editable documents)
-- Optional: a scheduled task, to run the search automatically every morning
+- Optional: Claude Docs (for tailored resumes and cover letters as editable documents)
+- Optional: scheduled tasks, to run the search every morning and send the weekly digest
 
 ## Install
 
-1. Download this repository (green **Code** button → **Download ZIP**), or download `job-radar.skill` from the Releases page.
+1. Download this repository (green **Code** button → **Download ZIP**), or download `job-radar.skill` from the [latest release](https://github.com/nehasu19/job-radar/releases/latest) (or from the repository root).
 2. In Claude, go to **Settings → Capabilities → Skills** and upload the `job-radar` folder (zipped) or the `.skill` file.
    If your organisation manages skills, ask your admin to add it.
 
@@ -35,13 +36,18 @@ Claude will ask for your resume, target roles, locations, language level, availa
 
 | You say | What happens |
 |---|---|
-| "Run job radar" | Full search: new jobs scored and added to your tracker, tailored resumes for the best ones |
+| "Run job radar" | Full search: closed postings flagged, new jobs scored and added to your tracker, tailored resumes and cover letters for the best ones |
 | "Add this job to my tracker" + a link or pasted posting | Checks and scores that one job |
-| "Tailor my resume for the <company> job" | Writes a tailored resume for a job already in your tracker |
+| "Tailor my resume for the <company> job" | Writes a tailored resume and cover letter for a job already in your tracker |
+| "Write a cover letter for the <company> job" | Writes just the cover letter |
+| "Check for closed postings" | Rechecks open jobs and flags the ones that were taken down |
+| "Send my weekly digest" | The weekly summary, on demand |
 
 ## Run it automatically
 
-Ask Claude: *"Create a scheduled task that runs Job Radar every weekday at 8:45"*. A ready-made prompt is in [`examples/scheduled-task-prompt.md`](examples/scheduled-task-prompt.md).
+**Daily search.** Ask Claude: *"Create a scheduled task that runs Job Radar every day at 8:45"*. It runs on weekends too, so new roles are in your tracker before Monday. A short prompt is in [`examples/scheduled-task-prompt.md`](examples/scheduled-task-prompt.md); the full version is [`prompt/job-radar-routine.md`](prompt/job-radar-routine.md).
+
+**Weekly digest.** Ask Claude: *"Create a scheduled task every Sunday at 18:30 using the prompt in prompt/weekly-digest.md"*, with your name and tracker link filled in. It is read-only and sends you the week's top 5 roles, jobs found vs last week, jobs still waiting on you and your progress. The prompt is in [`prompt/weekly-digest.md`](prompt/weekly-digest.md).
 
 ## LinkedIn
 
@@ -49,7 +55,7 @@ LinkedIn blocks automated reading of its pages, and Job Radar respects that. Ins
 
 ## Principles
 
-- **Truthful resumes:** only your real experience, reordered and reworded – never invented skills, titles, dates or degrees.
+- **Truthful resumes and cover letters:** only your real experience, reordered and reworded – never invented skills, titles, dates or degrees.
 - **No actions on your behalf:** no applications, no messages, no form submissions.
 - **Your data stays yours:** your profile and jobs live in your own private tracker.
 
@@ -57,29 +63,20 @@ LinkedIn blocks automated reading of its pages, and Job Radar respects that. Ins
 
 MIT – see [LICENSE](LICENSE).
 
+## What's new in v3.0.0
+
+- **Weekly digest** every Sunday: top 5 roles, jobs found vs last week, and jobs still waiting on you
+- **Cover-letter drafts** next to each tailored resume — truthful, with gaps handled honestly
+- **Closed-posting detection:** taken-down jobs are flagged automatically
+- **Tracker stats:** jobs per week, average match score, and progress from found to interviewing
+
+See [CHANGELOG.md](CHANGELOG.md) for details.
+
 ## What's new in v2.0.0
 
 - Runs **every day, including weekends** (v1 ran weekdays only)
 - Searches StepStone, LinkedIn, Indeed, XING, Glassdoor, Arbeitsagentur, Arbeitnow, Built In, TestDevJobs, Jobgether and company career pages
 - Better duplicate detection when the same role is listed under a parent company
 - Adds the tracker page (`tracker/`), the daily task prompt (`prompt/`) and the data model (`docs/`)
-
-See [CHANGELOG.md](CHANGELOG.md) for details.
-
-## What's new in v3.0.0
-
-- **Weekly digest** every Sunday: top 5 roles, jobs found vs last week, and jobs still waiting on you
-- **Cover-letter drafts** next to each tailored resume — truthful, with gaps handled honestly
-- **Closed-posting detection:** taken-down jobs are flagged automatically
-- **Tracker stats:** jobs per week, average match score, and progress from found to interviewing
-
-See [CHANGELOG.md](CHANGELOG.md) for details.
-
-## What's new in v3.0.0
-
-- **Weekly digest** every Sunday: top 5 roles, jobs found vs last week, and jobs still waiting on you
-- **Cover-letter drafts** next to each tailored resume — truthful, with gaps handled honestly
-- **Closed-posting detection:** taken-down jobs are flagged automatically
-- **Tracker stats:** jobs per week, average match score, and progress from found to interviewing
 
 See [CHANGELOG.md](CHANGELOG.md) for details.

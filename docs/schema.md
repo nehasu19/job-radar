@@ -6,6 +6,7 @@ The tracker artifact's database has two collections.
 
 | Field | Type | Notes |
 |---|---|---|
+| `name` | string | Full name, used in resume and cover-letter titles |
 | `resume` | string | Full base resume, plain text |
 | `roles` | string[] | Target roles |
 | `locations` | string[] | Acceptable locations / remote rules |
@@ -14,6 +15,7 @@ The tracker artifact's database has two collections.
 | `excluded_employers` | string[] | Never logged |
 | `schedule` | string | Shown on the tracker |
 | `resume_updated` | string | ISO date |
+| `timezone` | string | Optional, for the weekly digest (default `Europe/Berlin`) |
 
 ## `jobs/<doc_id>`
 
