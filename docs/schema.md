@@ -4,18 +4,28 @@ The tracker artifact's database has two collections.
 
 ## `config/profile` (owner-only)
 
-| Field | Type | Notes |
-|---|---|---|
-| `name` | string | Full name, used in resume and cover-letter titles |
-| `resume` | string | Full base resume, plain text |
-| `roles` | string[] | Target roles |
-| `locations` | string[] | Acceptable locations / remote rules |
-| `german` | string | Language rule used for filtering |
-| `availability` | string | Start date |
-| `excluded_employers` | string[] | Never logged |
-| `schedule` | string | Shown on the tracker |
-| `resume_updated` | string | ISO date |
-| `timezone` | string | Optional, for the weekly digest (default `Europe/Berlin`) |
+See [`examples/profile.example.json`](../examples/profile.example.json) for a filled-in example.
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `name` | string | yes | Full name, used in resume and cover-letter titles |
+| `resume` | string | yes | Full base resume, plain text |
+| `roles` | string[] | yes | Target roles |
+| `locations` | string[] | yes | Acceptable locations / remote rules |
+| `language_rules` | string | yes | Languages you can work in and what to skip or flag as "stretch". Older trackers may use `german` instead; both are read |
+| `availability` | string | yes | Notice period / start date |
+| `excluded_employers` | string[] | yes | Never logged (e.g. current employer) |
+| `target_companies` | string[] | no | Career pages to check directly |
+| `domains` | string[] | no | Industries to favour in search and scoring |
+| `key_skills` | string[] | no | Skills to weigh more heavily in scoring |
+| `timezone` | string | no | IANA zone for the weekly digest; default `Europe/Berlin` |
+| `min_score` | number | no | Minimum score to log a job; default 60 |
+| `resume_min_score` | number | no | Minimum score for a tailored resume and cover letter; default 75 |
+| `max_age_days` | number | no | Skip postings older than this; default 21 |
+| `max_new_per_run` | number | no | New jobs added per run; default 10 |
+| `max_closed_checks` | number | no | Open jobs rechecked for closure per run; default 12 |
+| `schedule` | string | no | Shown on the tracker |
+| `resume_updated` | string | no | ISO date |
 
 ## `jobs/<doc_id>`
 

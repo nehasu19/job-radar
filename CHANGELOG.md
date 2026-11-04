@@ -15,6 +15,8 @@
 ### Fixed
 - README and example scheduled-task prompt still described weekday-only runs; they now say every day, including weekends.
 - README now explains how to set up the weekly digest.
+- `prompt/job-radar-routine.md` no longer hard-codes one person's language rules, scoring angle and thresholds; everything comes from the profile.
+- `docs/schema.md` and `examples/profile.example.json` now list the same profile fields, including `key_skills`, `timezone` and `max_closed_checks`.
 
 ## [2.0.0] — 2026-11-01
 

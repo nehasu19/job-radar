@@ -23,8 +23,14 @@
     "industry 1",
     "industry 2"
   ],
+  "key_skills": [
+    "Skill you want emphasised",
+    "Another skill"
+  ],
+  "timezone": "Europe/Berlin",
   "min_score": 60,
   "resume_min_score": 75,
   "max_age_days": 21,
-  "max_new_per_run": 10
+  "max_new_per_run": 10,
+  "max_closed_checks": 12
 }
