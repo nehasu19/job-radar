@@ -16,7 +16,7 @@ It **never** applies to jobs, fills in forms or contacts anyone. You stay in con
 - A Claude plan with skills and artifacts enabled (claude.ai or the Claude app)
 - Web search enabled
 - Optional: Claude Docs (for tailored resumes and cover letters as editable documents)
-- Optional: a `tailored-cv` skill and a `no-ai-slop` skill; if you have them, Job Radar follows them when it drafts resumes and cover letters
+- Recommended: the `tailored-cv` and `no-ai-slop` skills included here; Job Radar follows them when it drafts resumes and cover letters, and falls back to its own rules without them
 - Optional: scheduled tasks, to run the search every morning and send the weekly digest
 
 ## Install
@@ -24,6 +24,13 @@ It **never** applies to jobs, fills in forms or contacts anyone. You stay in con
 1. Download this repository (green **Code** button → **Download ZIP**), or download `job-radar.skill` from the [latest release](https://github.com/nehasu19/job-radar/releases/latest) (or from the repository root).
 2. In Claude, go to **Settings → Capabilities → Skills** and upload the `job-radar` folder (zipped) or the `.skill` file.
    If your organisation manages skills, ask your admin to add it.
+3. Recommended: upload `tailored-cv.skill` and `no-ai-slop.skill` the same way. They are the companion skills Job Radar uses for resumes and cover letters, and you can also use them on their own ("tailor my CV for this job", "make this cover letter sound less like AI").
+
+| Skill | What it does |
+|---|---|
+| `job-radar` | Finds and scores jobs, keeps the tracker current, drafts application documents |
+| `tailored-cv` | Tailors a resume (and cover letter) to one posting, using only facts from your base resume |
+| `no-ai-slop` | Strips buzzwords, filler and AI-sounding phrasing from anything you'll send as your own |
 
 ## First run
 
@@ -69,7 +76,7 @@ MIT – see [LICENSE](LICENSE).
 - **Application details** on the tracker: your contact details, work permit, visa needs, salary expectation and start date, with a Copy button per field for pasting into application forms. Edit them on the page.
 - Cover letters take their header, start date, salary and work-permit lines from those details, so they always match what you put in forms.
 - Scoring knows whether you need visa sponsorship, and lowers the score a little when a posting's salary is clearly below your expectation.
-- Resumes and cover letters follow your `tailored-cv` and `no-ai-slop` skills when you have them.
+- **Two companion skills included:** `tailored-cv` (tailors a resume and cover letter to one posting) and `no-ai-slop` (plain, human wording). Job Radar uses them when they're installed.
 - Each job card says what to upload: the tailored resume and cover letter, or your base resume.
 
 See [CHANGELOG.md](CHANGELOG.md) for details.

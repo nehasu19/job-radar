@@ -7,6 +7,7 @@ Versions 3.1 and 3.2 were never released; their changes are included here.
 ### Added
 - **Application details:** optional `application` block in `config/profile` (name, email, phone, LinkedIn, location, work permit, visa sponsorship, salary, current job end, earliest start, German, English). The tracker shows it as "Application details" with a Copy button per field and lets you edit it. Documented in `docs/schema.md` and `examples/profile.example.json`.
 - Tracker job cards show what to upload for each job (tailored resume and cover letter, or the base resume).
+- **Companion skills:** `tailored-cv/` and `no-ai-slop/` (plus `tailored-cv.skill` and `no-ai-slop.skill`). `tailored-cv` tailors a resume and cover letter to one posting from the base resume in the tracker profile; `no-ai-slop` is the wording and style pass. Both work on their own too.
 
 ### Changed
 - The skill reads `application` fresh on every run. Cover-letter headers, availability, salary (only when the posting asks) and work-authorisation lines come from it; resume notes compare the posting's salary and start date against it.
