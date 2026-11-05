@@ -125,6 +125,22 @@ footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);display
 @media (max-width:780px){.hero{grid-template-columns:minmax(0,1fr)}.scope{max-width:300px}.phrase{grid-template-columns:minmax(0,1fr) auto}.phrase span{grid-column:1/-1;grid-row:2}}
 @media (max-width:480px){.job{grid-template-columns:1fr}.score{height:auto;width:max-content;padding:4px 10px;grid-auto-flow:column;gap:6px}.steps li{grid-template-columns:1fr}.steps li::before{width:48px}}
 @media (prefers-reduced-motion:reduce){.sweep{animation:none}}
+
+/* Updates sign-up */
+.reg{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:10px;max-width:520px}
+.reg-label{font-weight:600;font-size:.92rem}
+button.btn{cursor:pointer}
+.btn.ghost[aria-expanded="true"]{background:var(--signal-soft)}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.row input[type=email]{flex:1 1 240px;min-width:0;font:inherit;padding:11px 14px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink)}
+.row input[type=email]:focus-visible,.consent input:focus-visible{outline:2px solid var(--blip);outline-offset:2px}
+.row button{font:600 .98rem var(--body);border:1px solid var(--signal);background:var(--signal);color:var(--paper);border-radius:8px;padding:11px 18px;cursor:pointer}
+.row button[disabled]{opacity:.6;cursor:wait}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:.9rem;color:var(--muted)}
+.consent input{margin-top:4px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.msg{font-size:.93rem;min-height:1.4em}
+.msg.ok{color:var(--good)} .msg.err{color:var(--bad)}
 </style>
 </head>
 <body>
@@ -139,7 +155,18 @@ footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);display
     <div class="cta">
       <a class="btn primary" href="https://github.com/nehasu19/job-radar/releases/latest" target="_blank" rel="noopener">Download from GitHub</a>
       <a class="btn ghost" href="#start">How to start</a>
+      <button class="btn ghost" type="button" id="reg-toggle" aria-expanded="false" aria-controls="signup-form">Register for updates</button>
     </div>
+    <form id="signup-form" class="reg" novalidate hidden>
+      <label for="signup-email" class="reg-label">Your email</label>
+      <div class="row">
+        <input id="signup-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+        <button id="signup-btn" type="submit">Register</button>
+      </div>
+      <label class="consent" for="signup-consent"><input id="signup-consent" type="checkbox" required><span>Store my email to send me Job Radar updates. I can unsubscribe any time.</span></label>
+      <div class="hp" aria-hidden="true"><label for="signup-website">Website</label><input id="signup-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+      <p class="msg" id="signup-msg" role="status" aria-live="polite"></p>
+    </form>
     <div class="facts"><span>About 40 countries</span><span>Truthful tailored resumes</span><span>MIT licence</span></div>
   </div>
   <div>
@@ -298,6 +325,33 @@ document.querySelectorAll(".copy").forEach(b=>{
     try{navigator.clipboard.writeText(text).then(done,fallback);}catch(e){fallback();}
   });
 });
+
+// Updates sign-up: posts {"email": ...} to the waitlist webhook.
+const WEBHOOK_URL="https://platform.clawchat.co/webhook-test/c577a938-9ed5-4fec-9d6b-24b7a9a69d7c";
+const WEBHOOK_TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWRpZW5jZSI6Imh0dHBzOi8vbmVoYXN1MTkuZ2l0aHViLmlvL2pvYi1yYWRhci8iLCJleHBpcmVzSW4iOjMwMCwiaXNzdWVyIjoiaHR0cHM6Ly9uZWhhc3UxOS5naXRodWIuaW8vam9iLXJhZGFyLyIsImp3dGlkIjoiYjVkY2U4MDQ1ZDRiNjVhMDM2YWZjMzgzNWUwYWViMDMiLCJub3RCZWZvcmUiOiIyMDI2LTExLTA1VDEyOjU3OjE1LjY0NyswMTowMCIsInN1YmplY3QiOiJXYWl0bGlzdCIsImlhdCI6MTc5Mzg3OTgzNX0.uPPbJlV59CRK1VvyLXX4VJXKU0eNFahdKKF8PpEXL8E"; // leave "" if the webhook needs no token
+(function(){
+  const tog=document.getElementById("reg-toggle");
+  const form=document.getElementById("signup-form"),email=document.getElementById("signup-email"),consent=document.getElementById("signup-consent"),hp=document.getElementById("signup-website"),btn=document.getElementById("signup-btn"),msg=document.getElementById("signup-msg");
+  tog.addEventListener("click",()=>{const open=form.hidden;form.hidden=!open;tog.setAttribute("aria-expanded",String(open));if(open)email.focus();});
+  const say=(t,c)=>{msg.textContent=t;msg.className="msg"+(c?" "+c:"");};
+  form.addEventListener("submit",async e=>{
+    e.preventDefault();
+    const v=email.value.trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){say("Enter a valid email address, like name@example.com.","err");email.focus();return;}
+    if(!consent.checked){say("Tick the box to agree that we store your email for updates.","err");consent.focus();return;}
+    if(hp.value){say("Thanks! You're on the list.","ok");form.reset();return;} // bot filled the hidden field
+    btn.disabled=true;btn.textContent="Sending…";say("");
+    try{
+      const headers={"Content-Type":"application/json"};
+      if(WEBHOOK_TOKEN)headers.Authorization="Bearer "+WEBHOOK_TOKEN;
+      const r=await fetch(WEBHOOK_URL,{method:"POST",headers,body:JSON.stringify({email:v})});
+      if(!r.ok)throw new Error("HTTP "+r.status);
+      say("Thanks! You're on the list.","ok");form.reset();
+    }catch(err){
+      say("That didn't go through. Please try again in a few minutes.","err");
+    }finally{btn.disabled=false;btn.textContent="Register";}
+  });
+})();
 </script>
 </body>
 </html>
