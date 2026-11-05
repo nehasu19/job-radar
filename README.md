@@ -1,5 +1,7 @@
 # Job Radar – a Claude skill for job searching
 
+   **New to Claude skills?** See the step-by-step guide: https://nehasu19.github.io/job-radar/
+
 Job Radar is a [Claude](https://claude.ai) skill that runs a personal job search for you, in any country:
 
 - searches the right job boards for **your** markets (about 40 countries plus remote boards) and company career pages, in English and the local language
