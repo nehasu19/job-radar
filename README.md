@@ -1,12 +1,12 @@
 # Job Radar – a Claude skill for job searching
 
-Job Radar is a [Claude](https://claude.ai) skill that runs a personal job search for you:
+Job Radar is a [Claude](https://claude.ai) skill that runs a personal job search for you, in any country:
 
-- searches job boards and company career pages for roles that match **your** profile
+- searches the right job boards for **your** markets (about 40 countries plus remote boards) and company career pages, in English and the local language
 - opens each posting to check it is still live and recent
-- scores each job 0–100 against your resume (role, skills, domain, location, language)
+- scores each job 0–100 against your resume (role, skills, domain, location, languages, work rights, salary in your currency)
 - saves good matches to your own **Job Radar tracker**, without duplicates
-- drafts **truthful** tailored resumes and cover letters for the best matches
+- drafts **truthful** tailored resumes and cover letters for the best matches, following the local CV style (photo or not, length, date format, greeting)
 - flags postings that have been taken down, and sends you a weekly digest
 
 It **never** applies to jobs, fills in forms or contacts anyone. You stay in control.
@@ -38,7 +38,9 @@ Say to Claude:
 
 > Set up Job Radar for me
 
-Claude will ask for your resume, target roles, locations, language level, availability and any employers to exclude, then create your tracker page. See [`examples/profile.example.json`](examples/profile.example.json) for the profile fields.
+Claude will ask for your resume, target roles, locations, home country, time zone, languages, where you can work (and where you'd need a visa), salary expectation with currency, availability and any employers to exclude, then create your tracker page. See [`examples/profile.example.json`](examples/profile.example.json) for the profile fields and [`job-radar/examples/profiles.md`](job-radar/examples/profiles.md) for filled-in examples from Berlin, London, Bengaluru, Toronto and Dubai.
+
+**One tracker per person.** Your tracker holds your resume and contact details. To let a friend or colleague use Job Radar, share the skill, not your tracker – they run "Set up Job Radar for me" and get their own.
 
 ## Everyday use
 
@@ -53,9 +55,9 @@ Claude will ask for your resume, target roles, locations, language level, availa
 
 ## Run it automatically
 
-**Daily search.** Ask Claude: *"Create a scheduled task that runs Job Radar every day at 8:45"*. It runs on weekends too, so new roles are in your tracker before Monday. A short prompt is in [`examples/scheduled-task-prompt.md`](examples/scheduled-task-prompt.md); the full version is [`prompt/job-radar-routine.md`](prompt/job-radar-routine.md).
+**Daily search.** Ask Claude: *"Create a scheduled task that runs Job Radar every day at 8:45"* (in your own time zone). It runs on weekends too, so new roles are in your tracker before your week starts. A short prompt is in [`examples/scheduled-task-prompt.md`](examples/scheduled-task-prompt.md); the full version is [`job-radar/prompt/job-radar-routine.md`](job-radar/prompt/job-radar-routine.md).
 
-**Weekly digest.** Ask Claude: *"Create a scheduled task every Sunday at 18:30 using the prompt in prompt/weekly-digest.md"*, with your name and tracker link filled in. It is read-only and sends you the week's top 5 roles, jobs found vs last week, jobs still waiting on you and your progress. The prompt is in [`prompt/weekly-digest.md`](prompt/weekly-digest.md).
+**Weekly digest.** Ask Claude: *"Create a scheduled task at the end of my week using the prompt in job-radar/prompt/weekly-digest.md"*, with your tracker link filled in. It is read-only and sends you the week's top 5 roles, jobs found vs last week, jobs still waiting on you and your progress. If your week runs Sunday–Thursday, set `week_start` to `sunday` in your profile. The prompt is in [`job-radar/prompt/weekly-digest.md`](job-radar/prompt/weekly-digest.md).
 
 ## LinkedIn
 
@@ -67,9 +69,37 @@ LinkedIn blocks automated reading of its pages, and Job Radar respects that. Ins
 - **No actions on your behalf:** no applications, no messages, no form submissions.
 - **Your data stays yours:** your profile and jobs live in your own private tracker.
 
+## What's inside
+
+| Path | What it is |
+|---|---|
+| `job-radar/SKILL.md` | The skill |
+| `job-radar/tracker/index.html` | The tracker page Claude publishes at setup |
+| `job-radar/docs/schema.md` | Every profile and job field |
+| `job-radar/references/` | Job boards by country, CV conventions by market, work-rights rules |
+| `job-radar/prompt/` | Scheduled-task prompts (daily run, weekly digest) |
+| `job-radar/examples/profiles.md` | Example profiles for several countries |
+| `tailored-cv/`, `no-ai-slop/` | Companion skills |
+| `*.skill` | Ready-to-upload packages of each skill |
+
+## Contributing job boards and CV norms
+
+Job boards and hiring customs change. If a board in [`job-radar/references/job-boards.md`](job-radar/references/job-boards.md) or a row in [`job-radar/references/cv-conventions.md`](job-radar/references/cv-conventions.md) is out of date for your country, open an issue or pull request.
+
 ## Licence
 
 MIT – see [LICENSE](LICENSE).
+
+## What's new in v4.0.0
+
+- **Works in any country.** Boards for about 40 countries plus remote and specialist boards; searches in English and the local language.
+- **Languages, work rights and salary for anyone:** a list of languages with levels, where you can work and where you'd need sponsorship, and a salary with currency. Jobs you can't legally take are skipped; salaries are only compared in the same currency.
+- **Local CV style:** tailored resumes and cover letters follow the job market's norms (photo, length, date format, spelling, greeting).
+- **Everything ships in the skill:** the tracker page, schema and prompts now live in `job-radar/` and are included in `job-radar.skill`.
+- **Tracker:** country filter, language and work-rights tags, your name in the title, your own week start.
+- **Upgrading from v3:** nothing breaks. Old profiles and trackers keep working; Claude offers once to move your profile to the new fields.
+
+See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## What's new in v3.3.0
 

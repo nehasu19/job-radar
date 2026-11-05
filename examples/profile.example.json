@@ -10,7 +10,37 @@
     "Preferred city",
     "Remote within your country"
   ],
-  "language_rules": "Describe the languages you can work in, e.g. 'Include English-speaking roles and roles asking for basic local language. Skip roles requiring fluent local language unless an excellent match, then flag as stretch.'",
+  "home_country": "XX (ISO 3166 alpha-2, e.g. DE, GB, IN, US)",
+  "timezone": "Region/City (IANA, e.g. Europe/Berlin, Asia/Kolkata, America/Toronto)",
+  "week_start": "monday",
+  "languages": [
+    {
+      "lang": "English",
+      "level": "C1",
+      "can_write_applications": true
+    },
+    {
+      "lang": "Local language",
+      "level": "B1",
+      "can_write_applications": false
+    }
+  ],
+  "language_policy": "Include roles in languages I meet; flag one level above mine as 'stretch' only if otherwise an excellent match; skip anything higher.",
+  "work_rights": {
+    "authorised": [
+      "XX"
+    ],
+    "needs_sponsorship_for": [],
+    "notes": "e.g. citizen, permanent resident, work permit type"
+  },
+  "salary": {
+    "amount": 70000,
+    "currency": "EUR",
+    "period": "year",
+    "basis": "gross"
+  },
+  "salary_display": "EUR 70,000 gross per year",
+  "cv_style": "INTL (or DE, UK, US, IN, FR, NL, NORDIC, ... — see job-radar/references/cv-conventions.md)",
   "availability": "Available from DD Month YYYY",
   "excluded_employers": [
     "Your current employer"
@@ -27,7 +57,8 @@
     "Skill you want emphasised",
     "Another skill"
   ],
-  "timezone": "Europe/Berlin",
+  "boards": [],
+  "contract_ok": false,
   "min_score": 60,
   "resume_min_score": 75,
   "max_age_days": 21,
@@ -39,12 +70,11 @@
     "phone": "+00 000 0000000",
     "linkedin": "https://www.linkedin.com/in/your-profile",
     "location": "City, Country",
-    "work_permit": "Yes, valid work permit",
+    "work_rights_summary": "e.g. Right to work in <country>, no sponsorship needed",
     "visa_sponsorship": "No",
     "salary": "EUR 70,000 gross per year",
     "current_job_ends": "DD Month YYYY",
     "earliest_start": "DD Month YYYY",
-    "german": "B1",
-    "english": "Professional working proficiency"
+    "languages_summary": "English C1, <local language> B1"
   }
 }

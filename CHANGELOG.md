@@ -1,5 +1,34 @@
 # Changelog
 
+## [4.0.0] — 2026-11-05
+
+Global release: Job Radar now works for candidates in any country. Existing v3 trackers and profiles keep working unchanged.
+
+### Added
+- `job-radar/references/job-boards.md`: job boards for Europe, the Americas, Asia-Pacific, the Middle East and Africa, plus global remote and specialist boards, and tips for local-language queries.
+- `job-radar/references/cv-conventions.md`: CV and cover-letter norms by market (length, photo and personal data, date format, spelling, greeting, closing).
+- `job-radar/references/work-rights.md`: how to read work-authorisation lines in postings and match them to the profile.
+- `job-radar/examples/profiles.md`: sample profiles for Berlin, London, Bengaluru, Toronto and Dubai.
+- Profile fields: `home_country`, `languages` (list with CEFR levels), `language_policy`, `work_rights`, `salary` (amount, currency, period, basis), `salary_display`, `cv_style`, `week_start`, `date_format`, `boards`, `contract_ok`.
+- Job fields: `country`, `language_required`, `work_auth`, `salary`.
+- Tracker page: title taken from the profile, generic "Language" and "Work rights" tags, salary tag, a country filter when jobs span several countries, week start from the profile, dates in the viewer's locale, and a search-profile panel showing languages, work rights, salary and time zone.
+
+### Changed
+- **The tracker page, data schema and scheduled-task prompts now ship inside the skill** (`job-radar/tracker/`, `job-radar/docs/`, `job-radar/prompt/`), so `job-radar.skill` contains everything the skill refers to. They moved from the repository root.
+- Search picks boards per target market and queries in English plus each market's local language.
+- Scoring checks every required language against the profile, applies work-rights rules, and compares salaries only in the same currency and period (no currency conversion).
+- Tailored documents follow the job market's CV convention and are written in the posting's language only when the candidate can write applications in it.
+- `timezone` is required for new profiles (no Europe/Berlin default).
+- Setup asks for country, time zone, languages, work rights and salary currency, and reminds the user that each person keeps their own tracker.
+- The closed-posting check recognises closed / expired / archived / filled wording in any language, and treats an aggregator copy as closed when the employer's original is.
+- Scheduled-task prompts load the skill instead of repeating its steps, so they stay in sync with it.
+- `examples/profile.example.json` uses the v4 fields.
+
+### Compatibility
+- v3 fields (`german`, `language_rules`, `work_permit`, `salary_expectation`, `application.german`, `application.english`, `application.work_permit`) are still read. Profiles are not rewritten unless the user asks.
+- Jobs with `german` show a "German:" tag; new jobs use `language_required`.
+- A v3 tracker page keeps working with v4 data; republishing `job-radar/tracker/index.html` is optional.
+
 ## [3.3.0] — 2026-11-04
 
 Versions 3.1 and 3.2 were never released; their changes are included here.
