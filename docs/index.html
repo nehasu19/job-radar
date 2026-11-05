@@ -157,7 +157,8 @@ button.btn{cursor:pointer}
       <a class="btn ghost" href="#start">How to start</a>
       <button class="btn ghost" type="button" id="reg-toggle" aria-expanded="false" aria-controls="signup-form">Register for updates</button>
     </div>
-    <form id="signup-form" class="reg" novalidate hidden>
+    <form id="signup-form" class="reg" method="post" target="_blank" novalidate hidden>
+      <input type="hidden" name="embed" value="1">
       <label for="signup-email" class="reg-label">Your email</label>
       <div class="row">
         <input id="signup-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
@@ -326,30 +327,23 @@ document.querySelectorAll(".copy").forEach(b=>{
   });
 });
 
-// Updates sign-up: posts {"email": ...} to the waitlist webhook.
-const WEBHOOK_URL="https://platform.clawchat.co/webhook-test/c577a938-9ed5-4fec-9d6b-24b7a9a69d7c";
-const WEBHOOK_TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWRpZW5jZSI6Imh0dHBzOi8vbmVoYXN1MTkuZ2l0aHViLmlvL2pvYi1yYWRhci8iLCJleHBpcmVzSW4iOjMwMCwiaXNzdWVyIjoiaHR0cHM6Ly9uZWhhc3UxOS5naXRodWIuaW8vam9iLXJhZGFyLyIsImp3dGlkIjoiYjVkY2U4MDQ1ZDRiNjVhMDM2YWZjMzgzNWUwYWViMDMiLCJub3RCZWZvcmUiOiIyMDI2LTExLTA1VDEyOjU3OjE1LjY0NyswMTowMCIsInN1YmplY3QiOiJXYWl0bGlzdCIsImlhdCI6MTc5Mzg3OTgzNX0.uPPbJlV59CRK1VvyLXX4VJXKU0eNFahdKKF8PpEXL8E"; // leave "" if the webhook needs no token
+// Updates sign-up: Buttondown stores the email, sends the confirmation mail and handles unsubscribes.
+const BUTTONDOWN_USER=""; // your Buttondown username, e.g. "jobradar"
 (function(){
   const tog=document.getElementById("reg-toggle");
-  const form=document.getElementById("signup-form"),email=document.getElementById("signup-email"),consent=document.getElementById("signup-consent"),hp=document.getElementById("signup-website"),btn=document.getElementById("signup-btn"),msg=document.getElementById("signup-msg");
+  const form=document.getElementById("signup-form"),email=document.getElementById("signup-email"),consent=document.getElementById("signup-consent"),hp=document.getElementById("signup-website"),msg=document.getElementById("signup-msg");
+  form.action="https://buttondown.com/api/emails/embed-subscribe/"+encodeURIComponent(BUTTONDOWN_USER);
   tog.addEventListener("click",()=>{const open=form.hidden;form.hidden=!open;tog.setAttribute("aria-expanded",String(open));if(open)email.focus();});
   const say=(t,c)=>{msg.textContent=t;msg.className="msg"+(c?" "+c:"");};
-  form.addEventListener("submit",async e=>{
-    e.preventDefault();
+  form.addEventListener("submit",e=>{
     const v=email.value.trim();
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){say("Enter a valid email address, like name@example.com.","err");email.focus();return;}
-    if(!consent.checked){say("Tick the box to agree that we store your email for updates.","err");consent.focus();return;}
-    if(hp.value){say("Thanks! You're on the list.","ok");form.reset();return;} // bot filled the hidden field
-    btn.disabled=true;btn.textContent="Sending…";say("");
-    try{
-      const headers={"Content-Type":"application/json"};
-      if(WEBHOOK_TOKEN)headers.Authorization="Bearer "+WEBHOOK_TOKEN;
-      const r=await fetch(WEBHOOK_URL,{method:"POST",headers,body:JSON.stringify({email:v})});
-      if(!r.ok)throw new Error("HTTP "+r.status);
-      say("Thanks! You're on the list.","ok");form.reset();
-    }catch(err){
-      say("That didn't go through. Please try again in a few minutes.","err");
-    }finally{btn.disabled=false;btn.textContent="Register";}
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){e.preventDefault();say("Enter a valid email address, like name@example.com.","err");email.focus();return;}
+    if(!consent.checked){e.preventDefault();say("Tick the box to agree that we store your email for updates.","err");consent.focus();return;}
+    if(hp.value){e.preventDefault();say("Thanks! Check your inbox to confirm.","ok");form.reset();return;} // bot filled the hidden field
+    if(!BUTTONDOWN_USER){e.preventDefault();say("Sign-up isn't open yet. Please check back soon.","err");return;}
+    email.value=v; // the browser posts the form to Buttondown in a new tab
+    say("Almost done: check your inbox and click the link to confirm.","ok");
+    setTimeout(()=>form.reset(),0);
   });
 })();
 </script>
