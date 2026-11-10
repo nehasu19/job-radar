@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.1.0] — 2026-11-10
+
+New companion skill: resume-check. Job Radar itself is unchanged.
+
+### Added
+- **`resume-check/`** (plus `resume-check.skill`): scores a resume 0–100 against 39 ATS and recruiter checks in seven areas (file and parsing, contact, sections, content, job match, recruiter red flags, bias and gaps). With an uploaded PDF or DOCX it tests what an ATS can read; with a posting it scores the keyword match, counting must-haves double. Fixes are ranked by points gained, and rewrites use placeholders for numbers instead of inventing them. Missing skills are reported as gaps, never added. Shows a short report by default and the full report on request. Works on its own or reads the resume from the Job Radar tracker, and hands accepted fixes to `tailored-cv`.
+- `resume-check/examples/`: a fictional resume, job posting and the resulting report.
+- README: a "Which skill do I use?" guide and a tip to upload the file you actually send.
+
 ## [4.0.0] — 2026-11-05
 
 Global release: Job Radar now works for candidates in any country. Existing v3 trackers and profiles keep working unchanged.
