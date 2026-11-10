@@ -31,7 +31,7 @@
   --scope:#132a2c; --scope-line:#24474a; color-scheme:dark}
 
 body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 var(--body)}
-img{max-width:100%%}
+img{max-width:100%}
 a{color:var(--signal)}
 .wrap{max-width:1040px;margin:0 auto;padding-block:0 72px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 section{padding-top:64px}
@@ -102,6 +102,16 @@ p{margin:0}
 .why{font-size:.93rem;margin-top:8px;max-width:70ch}
 .links{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:.88rem;font-weight:600;color:var(--signal)}
 
+/* Resume check */
+.fixes{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px;max-width:70ch}
+.fixes li{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:.93rem;border-top:1px solid var(--line);padding-top:6px}
+.fixes li:first-child{border-top:0;padding-top:0}
+.fixes b{font:500 .85rem var(--mono);color:var(--good);white-space:nowrap}
+.ba{display:grid;gap:6px;margin-top:12px;max-width:70ch}
+.ba p{font-size:.93rem;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+.ba em{display:block;font:500 .7rem var(--mono);font-style:normal;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.ba p + p em{color:var(--signal)}
+
 /* Markets */
 .markets{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px;margin-top:24px}
 .mk{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:4px}
@@ -149,7 +159,7 @@ button.btn{cursor:pointer}
 
 <header class="hero">
   <div>
-    <p class="eyebrow">A free Claude skill · v4.0.0</p>
+    <p class="eyebrow">A free Claude skill · v4.1.0</p>
     <h1>Job Radar</h1>
     <p class="tag">Claude searches for jobs that fit your resume every morning, in any country, and keeps them in one tracker. It never applies or contacts anyone for you.</p>
     <div class="cta">
@@ -201,11 +211,11 @@ button.btn{cursor:pointer}
   <ol class="steps">
     <li><div>
       <h3>Download the skill</h3>
-      <p>Open the <a href="https://github.com/nehasu19/job-radar/releases/latest" target="_blank" rel="noopener">latest release on GitHub</a> and download <span class="path">job-radar.skill</span>. For better resumes, also download <span class="path">tailored-cv.skill</span> and <span class="path">no-ai-slop.skill</span>.</p>
+      <p>Open the <a href="https://github.com/nehasu19/job-radar/releases/latest" target="_blank" rel="noopener">latest release on GitHub</a> and download <span class="path">job-radar.skill</span>. For better resumes, also download <span class="path">tailored-cv.skill</span> and <span class="path">no-ai-slop.skill</span>. To score your resume before you apply, add <span class="path">resume-check.skill</span>.</p>
     </div></li>
     <li><div>
       <h3>Add it to Claude</h3>
-      <p>In Claude, open <span class="path">Settings → Capabilities → Skills</span>, choose to upload a skill, and select the file. Repeat for the other two files. Menu names can change slightly between app versions.</p>
+      <p>In Claude, open <span class="path">Settings → Capabilities → Skills</span>, choose to upload a skill, and select the file. Repeat for the other files. Menu names can change slightly between app versions.</p>
     </div></li>
     <li><div>
       <h3>Start a new chat and ask for setup</h3>
@@ -240,6 +250,8 @@ button.btn{cursor:pointer}
     <div class="phrase"><code id="q4">Write a cover letter for the [company] job</code><span>Just the cover letter</span><button class="copy" type="button" data-copy="q4">Copy</button></div>
     <div class="phrase"><code id="q5">Check for closed postings</code><span>Rechecks open jobs and flags the ones taken down</span><button class="copy" type="button" data-copy="q5">Copy</button></div>
     <div class="phrase"><code id="q6">Send my weekly digest</code><span>Top 5 roles this week, jobs waiting on you, and your progress</span><button class="copy" type="button" data-copy="q6">Copy</button></div>
+    <div class="phrase"><code id="q7">Check my resume</code><span>Attach your resume file. A score out of 100, the top 3 fixes and rewritten bullets (resume-check)</span><button class="copy" type="button" data-copy="q7">Copy</button></div>
+    <div class="phrase"><code id="q8">How well does my resume match this job? [paste posting]</code><span>Which skills the posting asks for that you have, word differently or are missing (resume-check)</span><button class="copy" type="button" data-copy="q8">Copy</button></div>
   </div>
 </section>
 
@@ -272,6 +284,34 @@ button.btn{cursor:pointer}
   </div>
 </section>
 
+<section aria-labelledby="check-h">
+  <p class="eyebrow">New in v4.1.0</p>
+  <h2 id="check-h">Check your resume before you apply</h2>
+  <p class="lede">The resume-check skill reads your resume the way an applicant tracking system and a recruiter would. You get a score out of 100, the three fixes worth the most points, and rewritten bullets. It never adds skills you don't have.</p>
+  <span class="badge">Example resume · not a real person</span>
+  <div class="sample">
+    <article class="job">
+      <div class="score s-mid">71<small>score</small></div>
+      <div>
+        <h3>Resume check for a Lead SDET role</h3>
+        <div class="meta">Ananya Example · Senior QA Engineer, 9 years · checked against an example posting</div>
+        <div class="tags"><span class="t ok">Job match: 88%</span><span class="t ok">4 of 6 must-haves found</span><span class="t unsure">Playwright: partly</span><span class="t str">Leading a team: gap</span></div>
+        <ol class="fixes">
+          <li><span>Quick fixes: one date format, a typo, a standard heading, add a LinkedIn URL</span><b>+7</b></li>
+          <li><span>Put your real title in the headline and drop "results-driven"</span><b>+4</b></li>
+          <li><span>Start 6 bullets with a plain verb instead of "Responsible for"</span><b>+4</b></li>
+        </ol>
+        <div class="ba">
+          <p><em>Before</em>Responsible for regression testing.</p>
+          <p><em>After</em>Ran regression testing for [N] releases a month, catching [N] release-blocking bugs in [year].</p>
+        </div>
+        <p class="why">Numbers it can't know stay as [placeholders] for you to fill in. Gaps go in your cover letter, not your resume.</p>
+      </div>
+    </article>
+  </div>
+  <p class="hint">Tip: attach the PDF or Word file you actually send to employers. Only the file shows whether an applicant tracking system can read it.</p>
+</section>
+
 <section aria-labelledby="world-h">
   <p class="eyebrow">Works anywhere</p>
   <h2 id="world-h">Set it up for your own market</h2>
@@ -291,7 +331,7 @@ button.btn{cursor:pointer}
   <h2 id="rails-h">What it will never do</h2>
   <div class="rails">
     <div class="rail"><h3>Apply for you</h3><p>No applications, no form submissions, no messages to employers or recruiters. You decide and you send.</p></div>
-    <div class="rail"><h3>Invent experience</h3><p>Tailored resumes only reorder and reword your real resume. No made-up skills, titles, dates or degrees.</p></div>
+    <div class="rail"><h3>Invent experience</h3><p>Tailored resumes and resume-check rewrites only reorder and reword your real resume. No made-up skills, titles, dates, degrees or numbers.</p></div>
     <div class="rail"><h3>Share your data</h3><p>Your profile and jobs live in your own private tracker. To share Job Radar, share the skill, never your tracker.</p></div>
     <div class="rail"><h3>Guess about visas or pay</h3><p>Jobs you can't legally take are skipped. Salaries in another currency are noted, never converted.</p></div>
   </div>
@@ -306,12 +346,13 @@ button.btn{cursor:pointer}
     <details><summary>Do I need to be technical?</summary><p>No. After uploading the file, everything happens in a normal chat. You never touch code.</p></details>
     <details><summary>Does it read LinkedIn?</summary><p>No, LinkedIn blocks automated reading. You can set up LinkedIn job alerts by email, connect your email to Claude, and ask Job Radar to check those jobs on each company's own careers page.</p></details>
     <details><summary>Can my friend use my tracker?</summary><p>No. The tracker holds your resume and contact details. Your friend downloads the skill and says "Set up Job Radar for me" to get their own.</p></details>
+    <details><summary>Is the resume score what employers see?</summary><p>No. It's a checklist score from 39 checks, not the number an employer's system gives. There is no universal ATS score, and most systems rank and filter resumes for a recruiter rather than reject them automatically. The score shows how much of the checklist your resume meets and which fixes help most.</p></details>
     <details><summary>What if a score looks wrong?</summary><p>Each job explains its score and lists the gaps. Tell Claude what to change, for example "skip roles that need German above B1", and ask it to update your profile before the next search.</p></details>
   </div>
 </section>
 
 <footer>
-  <span>Job Radar v4.0.0 · MIT licence</span>
+  <span>Job Radar v4.1.0 · MIT licence</span>
   <a href="https://github.com/nehasu19/job-radar" target="_blank" rel="noopener">github.com/nehasu19/job-radar</a>
 </footer>
 </div>
