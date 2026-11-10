@@ -19,6 +19,7 @@ It **never** applies to jobs, fills in forms or contacts anyone. You stay in con
 - Web search enabled
 - Optional: Claude Docs (for tailored resumes and cover letters as editable documents)
 - Recommended: the `tailored-cv` and `no-ai-slop` skills included here; Job Radar follows them when it drafts resumes and cover letters, and falls back to its own rules without them
+- Optional: the `resume-check` skill included here, to score your resume and see what to fix before you apply
 - Optional: scheduled tasks, to run the search every morning and send the weekly digest
 
 ## Install
@@ -26,13 +27,28 @@ It **never** applies to jobs, fills in forms or contacts anyone. You stay in con
 1. Download this repository (green **Code** button → **Download ZIP**), or download `job-radar.skill` from the [latest release](https://github.com/nehasu19/job-radar/releases/latest) (or from the repository root).
 2. In Claude, go to **Settings → Capabilities → Skills** and upload the `job-radar` folder (zipped) or the `.skill` file.
    If your organisation manages skills, ask your admin to add it.
-3. Recommended: upload `tailored-cv.skill` and `no-ai-slop.skill` the same way. They are the companion skills Job Radar uses for resumes and cover letters, and you can also use them on their own ("tailor my CV for this job", "make this cover letter sound less like AI").
+3. Recommended: upload `tailored-cv.skill`, `no-ai-slop.skill` and `resume-check.skill` the same way. They are the companion skills Job Radar uses for resumes and cover letters, and you can also use them on their own ("check my resume", "tailor my CV for this job", "make this cover letter sound less like AI").
 
 | Skill | What it does |
 |---|---|
 | `job-radar` | Finds and scores jobs, keeps the tracker current, drafts application documents |
 | `tailored-cv` | Tailors a resume (and cover letter) to one posting, using only facts from your base resume |
 | `no-ai-slop` | Strips buzzwords, filler and AI-sounding phrasing from anything you'll send as your own |
+| `resume-check` | Scores your resume 0–100 the way an ATS and a recruiter would read it, lists the fixes that matter most, and shows how well it matches a job posting |
+
+### Which skill do I use?
+
+| You want to… | Use | Say to Claude |
+|---|---|---|
+| Know how good your resume is, or why you're not getting callbacks | `resume-check` | "Check my resume" and attach the file |
+| See how well your resume matches one job | `resume-check` | "How well does my resume match this job?" and paste the posting |
+| Get a version of your resume for one job | `tailored-cv` | "Tailor my CV for this job" |
+| Make a cover letter, email or post sound like you wrote it | `no-ai-slop` | "Make this sound less like AI" |
+| Find jobs and keep track of them | `job-radar` | "Set up Job Radar for me", then "Run job radar" |
+
+**Tip:** for a resume check, attach the PDF or DOCX you actually send to employers, not pasted text. Only the file shows whether an ATS can read it: columns, headers and footers, icons, and scanned pages are the usual problems.
+
+You get a short report first: your score, the top 3 fixes and a few rewritten bullets. Say "full report" to see every check and the keyword table. See [`resume-check/examples/`](resume-check/examples/) for a sample.
 
 ## First run
 
@@ -81,7 +97,8 @@ LinkedIn blocks automated reading of its pages, and Job Radar respects that. Ins
 | `job-radar/references/` | Job boards by country, CV conventions by market, work-rights rules |
 | `job-radar/prompt/` | Scheduled-task prompts (daily run, weekly digest) |
 | `job-radar/examples/profiles.md` | Example profiles for several countries |
-| `tailored-cv/`, `no-ai-slop/` | Companion skills |
+| `tailored-cv/`, `no-ai-slop/`, `resume-check/` | Companion skills |
+| `resume-check/examples/` | A fictional resume, job posting and the resume-check report for them |
 | `*.skill` | Ready-to-upload packages of each skill |
 
 ## Contributing job boards and CV norms
@@ -91,6 +108,18 @@ Job boards and hiring customs change. If a board in [`job-radar/references/job-b
 ## Licence
 
 MIT – see [LICENSE](LICENSE).
+
+## What's new in v4.1.0
+
+- **New companion skill: resume-check.** Say "check my resume" and get a score out of 100, the three fixes that matter most, and rewritten bullets, before you apply.
+- **ATS read test:** attach the PDF or DOCX you send to employers and it checks whether an applicant tracking system can read it (columns, headers and footers, icons, scanned pages).
+- **Job match:** paste a posting to see which skills are found, worded differently, partly shown or missing. Must-haves count double.
+- **Ranked fixes and rewrites:** fixes are ordered by how many points each is worth. Missing skills are reported as gaps, never added, and numbers it can't know are left as `[placeholders]` for you to fill in.
+- **Short report first:** say "full report" to see all 39 checks and the keyword table.
+- **Works with Job Radar:** it can read the resume from your tracker and hand the fixes to tailored-cv to write a version for one job.
+- **Upgrading from v4.0.0:** nothing changes in Job Radar itself. Upload `resume-check.skill` if you want it.
+
+See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## What's new in v4.0.0
 
